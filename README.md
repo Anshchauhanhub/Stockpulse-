@@ -193,9 +193,9 @@ node server.js
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `GET` | `/api/symbols` | Get watchlist and latest prices |
-| `GET` | `/api/stats` | Server statistics (ticks, uptime, clients) |
+| `GET` | `/api/stats` | Server statistics (Market Events, uptime, clients) |
 | `GET` | `/api/history/:symbol` | Historical tick data from MongoDB |
-| `POST` | `/api/watchlist` | Add a new symbol to the watchlist |
+| `POST` | `/api/watchlist` | Add a new ticker to the watchlist |
 | `GET` | `/api/portfolio` | Get portfolio (cash, holdings, P&L) |
 | `POST` | `/api/trade` | Execute a paper trade (buy/sell) |
 | `GET` | `/api/news/:symbol` | Fetch news with sentiment analysis |

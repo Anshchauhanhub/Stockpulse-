@@ -174,7 +174,7 @@ body::before {
 
 /* ─── Activity Feed ───────────────────────────────────────── */
 .activity-feed { padding: 0; }
-.activity-item { display: grid; grid-template-columns: 70px 1fr 100px 80px; gap: 12px; align-items: center; padding: 8px 18px; font-size: 0.8rem; border-bottom: 1px solid rgba(75, 85, 99, 0.15); animation: fadeSlideIn 0.3s ease; }
+.activity-item { display: grid; grid-template-columns: 140px 1fr 100px 80px; gap: 12px; align-items: center; padding: 8px 18px; font-size: 0.8rem; border-bottom: 1px solid rgba(75, 85, 99, 0.15); animation: fadeSlideIn 0.3s ease; }
 .activity-item:last-child { border-bottom: none; }
 .activity-symbol { font-weight: 600; color: var(--text-primary); }
 .activity-price { font-family: 'JetBrains Mono', monospace; font-weight: 500; }
@@ -241,5 +241,5 @@ body::before {
   .stats-bar, .portfolio-bar { flex-wrap: wrap; }
   .stat-card, .portfolio-card { min-width: 100px; padding: 8px 12px; }
   .chart-controls { display: none; }
-  .activity-item { grid-template-columns: 60px 1fr 80px 70px; gap: 8px; }
+  .activity-item { grid-template-columns: 110px 1fr 80px 70px; gap: 8px; }
 }
