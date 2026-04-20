@@ -21,6 +21,8 @@ const $statClients = document.getElementById('statClients');
 const $statUptime = document.getElementById('statUptime');
 const $statMongo = document.getElementById('statMongo');
 const $liveClock = document.getElementById('liveClock');
+const $stockSearch = document.getElementById('stockSearch');
+const $addStockBtn = document.getElementById('addStockBtn');
 
 // ─── Clock ───────────────────────────────────────────────────────────────────
 function updateClock() {
@@ -148,6 +150,10 @@ function renderWatchlist(symbols, prices) {
     t.textContent = 'Watchlist';
     $watchlist.appendChild(t);
   }
+
+  // Preserve search container
+  const searchContainer = document.querySelector('.search-container');
+  if (searchContainer) $watchlist.prepend(searchContainer);
 
   symbols.forEach(symbol => {
     const card = document.createElement('div');
@@ -317,7 +323,10 @@ socket.on('init', (data) => {
   symbols.forEach(s => {
     if (!chartData[s]) chartData[s] = [];
     if (prices[s]) {
-      chartData[s].push({ price: prices[s].price, timestamp: prices[s].timestamp || new Date() });
+      // Check if data already exists to avoid duplicates on re-init
+      if (chartData[s].length === 0) {
+        chartData[s].push({ price: prices[s].price, timestamp: prices[s].timestamp || new Date() });
+      }
     }
   });
 
@@ -329,6 +338,25 @@ socket.on('init', (data) => {
   renderWatchlist(symbols, prices);
   updateChart();
   updateStats();
+});
+
+socket.on('watchlist_updated', (data) => {
+  const { symbols, newSymbol } = data;
+  $statSymbols.textContent = symbols.length;
+  
+  // Initialize data array for new symbol
+  if (newSymbol && !chartData[newSymbol]) {
+    chartData[newSymbol] = [];
+  }
+  
+  // Re-render watchlist with current latest prices
+  // We can fetch prices from the server or just keep existing
+  fetch('/api/symbols')
+    .then(r => r.json())
+    .then(d => {
+      renderWatchlist(d.symbols, d.prices);
+      if (newSymbol) selectSymbol(newSymbol);
+    });
 });
 
 socket.on('tick', (tick) => {
@@ -367,6 +395,37 @@ document.querySelectorAll('.chart-btn').forEach(btn => {
     maxDataPoints = parseInt(btn.dataset.points);
     updateChart();
   });
+});
+
+// ─── Search Logic ────────────────────────────────────────────────────────────
+function addStock() {
+  const symbol = $stockSearch.value.trim().toUpperCase();
+  if (!symbol) return;
+  
+  $addStockBtn.disabled = true;
+  $addStockBtn.textContent = '...';
+
+  fetch('/api/watchlist', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ symbol })
+  })
+  .then(r => r.json())
+  .then(data => {
+    $stockSearch.value = '';
+    $addStockBtn.disabled = false;
+    $addStockBtn.textContent = '+';
+  })
+  .catch(err => {
+    console.error('Error adding stock:', err);
+    $addStockBtn.disabled = false;
+    $addStockBtn.textContent = '+';
+  });
+}
+
+$addStockBtn.addEventListener('click', addStock);
+$stockSearch.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') addStock();
 });
 
 // ─── Init ────────────────────────────────────────────────────────────────────

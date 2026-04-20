@@ -191,6 +191,58 @@ body::before {
 .watchlist::-webkit-scrollbar-track { background: transparent; }
 .watchlist::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
+/* ─── Search Container ───────────────────────────────────── */
+.search-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 0 4px;
+}
+
+.search-container input {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.search-container input:focus {
+  border-color: var(--accent);
+  background: var(--bg-card-hover);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.search-container button {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  border: none;
+  border-radius: var(--radius-sm);
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.search-container button:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+.search-container button:active {
+  transform: scale(0.95);
+}
+
 .watchlist-title {
   font-size: 0.75rem;
   text-transform: uppercase;

@@ -90,18 +90,20 @@ async function processTick(tick) {
   }
 }
 
+let finnhubWsInstance = null; // Store reference to close/reopen if needed
+
 function connectFinnhub() {
   if (!FINNHUB_API_KEY || FINNHUB_API_KEY === 'your_finnhub_api_key_here') {
     console.log('No Finnhub API key. Starting simulated data...');
     startSimulatedData();
     return;
   }
-  const ws = new WebSocket(`wss://ws.finnhub.io?token=${FINNHUB_API_KEY}`);
-  ws.on('open', () => {
+  finnhubWsInstance = new WebSocket(`wss://ws.finnhub.io?token=${FINNHUB_API_KEY}`);
+  finnhubWsInstance.on('open', () => {
     console.log('Connected to Finnhub WebSocket');
-    WATCHLIST.forEach(s => ws.send(JSON.stringify({ type: 'subscribe', symbol: s })));
+    WATCHLIST.forEach(s => finnhubWsInstance.send(JSON.stringify({ type: 'subscribe', symbol: s })));
   });
-  ws.on('message', async (data) => {
+  finnhubWsInstance.on('message', async (data) => {
     try {
       const msg = JSON.parse(data.toString());
       if (msg.type === 'trade' && msg.data) {
@@ -111,8 +113,8 @@ function connectFinnhub() {
       }
     } catch (e) {}
   });
-  ws.on('error', (err) => console.error('Finnhub error:', err.message));
-  ws.on('close', () => { console.log('Finnhub closed. Reconnecting...'); setTimeout(connectFinnhub, 5000); });
+  finnhubWsInstance.on('error', (err) => console.error('Finnhub error:', err.message));
+  finnhubWsInstance.on('close', () => { console.log('Finnhub closed. Reconnecting...'); setTimeout(connectFinnhub, 5000); });
 }
 
 function startSimulatedData() {
@@ -135,6 +137,21 @@ function startSimulatedData() {
 }
 
 app.get('/api/symbols', (req, res) => res.json({ symbols: WATCHLIST, prices: latestPrices }));
+
+app.post('/api/watchlist', (req, res) => {
+  const { symbol } = req.body;
+  if (!symbol) return res.status(400).json({ error: 'Symbol required' });
+  const sym = symbol.toUpperCase().trim();
+  if (!WATCHLIST.includes(sym)) {
+    WATCHLIST.push(sym);
+    if (finnhubWsInstance && finnhubWsInstance.readyState === WebSocket.OPEN) {
+      finnhubWsInstance.send(JSON.stringify({ type: 'subscribe', symbol: sym }));
+    }
+    io.emit('watchlist_updated', { symbols: WATCHLIST, newSymbol: sym });
+    console.log(`➕ Added ${sym} to watchlist`);
+  }
+  res.json({ success: true, symbols: WATCHLIST });
+});
 
 app.get('/api/history/:symbol', async (req, res) => {
   const limit = parseInt(req.query.limit) || 100;
