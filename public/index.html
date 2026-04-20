@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="StockPulse - Real-time stock analytics dashboard with MongoDB Change Streams and WebSockets">
+  <meta name="description" content="StockPulse - Real-time stock analytics dashboard with Paper Trading, Sentiment Analysis, and Algorithmic Signals">
   <title>StockPulse — Real-Time Analytics</title>
   <link rel="stylesheet" href="/css/style.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
@@ -52,13 +52,55 @@
       </div>
     </div>
 
+    <!-- Portfolio Bar -->
+    <div class="portfolio-bar" id="portfolioBar">
+      <div class="portfolio-card">
+        <div class="portfolio-label">💰 Cash</div>
+        <div class="portfolio-value" id="pfCash">$100,000.00</div>
+      </div>
+      <div class="portfolio-card">
+        <div class="portfolio-label">📊 Holdings</div>
+        <div class="portfolio-value" id="pfHoldings">$0.00</div>
+      </div>
+      <div class="portfolio-card pnl-card">
+        <div class="portfolio-label">📈 P&L</div>
+        <div class="portfolio-value" id="pfPnL">$0.00 (0.00%)</div>
+      </div>
+      <div class="portfolio-card">
+        <div class="portfolio-label">🏦 Total Value</div>
+        <div class="portfolio-value accent" id="pfTotal">$100,000.00</div>
+      </div>
+    </div>
+
     <!-- Watchlist Sidebar -->
-    <aside class="watchlist" id="watchlist">
+    <aside class="watchlist">
       <div class="search-container">
-        <input type="text" id="stockSearch" placeholder="Search symbol (e.g. BTC-USD)" autocomplete="off">
+        <select id="popularSelect" class="search-select">
+          <option value="" disabled selected>Add Popular...</option>
+          <optgroup label="Stocks">
+            <option value="AAPL">Apple (AAPL)</option>
+            <option value="MSFT">Microsoft (MSFT)</option>
+            <option value="GOOGL">Google (GOOGL)</option>
+            <option value="AMZN">Amazon (AMZN)</option>
+            <option value="TSLA">Tesla (TSLA)</option>
+            <option value="NVDA">Nvidia (NVDA)</option>
+            <option value="META">Meta (META)</option>
+            <option value="NFLX">Netflix (NFLX)</option>
+            <option value="AMD">AMD</option>
+          </optgroup>
+          <optgroup label="Crypto">
+            <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
+            <option value="BINANCE:ETHUSDT">Ethereum (ETH)</option>
+            <option value="BINANCE:BNBUSDT">BNB</option>
+            <option value="BINANCE:SOLUSDT">Solana (SOL)</option>
+            <option value="BINANCE:DOGEUSDT">Doge (DOGE)</option>
+          </optgroup>
+        </select>
+        <input type="text" id="stockSearch" placeholder="or type symbol..." autocomplete="off">
         <button id="addStockBtn">+</button>
       </div>
       <div class="watchlist-title">Watchlist</div>
+      <div id="watchlistItems" class="watchlist-items"></div>
     </aside>
 
     <!-- Main Content -->
@@ -69,26 +111,55 @@
           <div class="chart-title">
             <h2 id="chartSymbol">AAPL</h2>
             <span class="live-badge">LIVE</span>
+            <span class="signal-badge" id="signalBadge">HOLD</span>
           </div>
           <div class="chart-controls">
+            <button class="chart-btn sma-toggle" id="smaToggle">SMA</button>
             <button class="chart-btn active" data-points="50">50</button>
             <button class="chart-btn" data-points="100">100</button>
             <button class="chart-btn" data-points="200">200</button>
           </div>
+        </div>
+        <!-- Trade Controls -->
+        <div class="trade-controls" id="tradeControls">
+          <input type="number" id="tradeShares" min="1" value="1" placeholder="Qty">
+          <button class="trade-btn buy-btn" id="buyBtn">BUY</button>
+          <button class="trade-btn sell-btn" id="sellBtn">SELL</button>
+          <span class="trade-info" id="tradeInfo"></span>
         </div>
         <div class="chart-wrapper">
           <canvas id="mainChart"></canvas>
         </div>
       </div>
 
-      <!-- Activity Feed -->
-      <div class="activity-panel">
-        <div class="activity-header">Recent Activity</div>
-        <div class="activity-feed" id="activityFeed"></div>
+      <!-- Tabbed Bottom Panel -->
+      <div class="bottom-panel">
+        <div class="tab-bar">
+          <button class="tab-btn active" data-tab="activity">📋 Activity</button>
+          <button class="tab-btn" data-tab="news">📰 News & Sentiment</button>
+          <button class="tab-btn" data-tab="trades">💼 Trade History</button>
+        </div>
+        <div class="tab-content active" id="tab-activity">
+          <div class="activity-feed" id="activityFeed"></div>
+        </div>
+        <div class="tab-content" id="tab-news">
+          <div class="news-sentiment-header" id="newsSentimentHeader"></div>
+          <div class="news-feed" id="newsFeed">
+            <div class="news-loading">Select a stock to load news...</div>
+          </div>
+        </div>
+        <div class="tab-content" id="tab-trades">
+          <div class="trades-feed" id="tradesFeed">
+            <div class="news-loading">No trades yet. Start trading!</div>
+          </div>
+        </div>
       </div>
     </main>
 
   </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
