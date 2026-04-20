@@ -53,12 +53,34 @@
     </div>
 
     <!-- Watchlist Sidebar -->
-    <aside class="watchlist" id="watchlist">
+    <aside class="watchlist">
       <div class="search-container">
-        <input type="text" id="stockSearch" placeholder="Search symbol (e.g. BTC-USD)" autocomplete="off">
+        <select id="popularSelect" class="search-select">
+          <option value="" disabled selected>Add Popular...</option>
+          <optgroup label="Stocks">
+            <option value="AAPL">Apple (AAPL)</option>
+            <option value="MSFT">Microsoft (MSFT)</option>
+            <option value="GOOGL">Google (GOOGL)</option>
+            <option value="AMZN">Amazon (AMZN)</option>
+            <option value="TSLA">Tesla (TSLA)</option>
+            <option value="NVDA">Nvidia (NVDA)</option>
+            <option value="META">Meta (META)</option>
+            <option value="NFLX">Netflix (NFLX)</option>
+            <option value="AMD">AMD</option>
+          </optgroup>
+          <optgroup label="Crypto">
+            <option value="BINANCE:BTCUSDT">Bitcoin (BTC)</option>
+            <option value="BINANCE:ETHUSDT">Ethereum (ETH)</option>
+            <option value="BINANCE:BNBUSDT">BNB</option>
+            <option value="BINANCE:SOLUSDT">Solana (SOL)</option>
+            <option value="BINANCE:DOGEUSDT">Doge (DOGE)</option>
+          </optgroup>
+        </select>
+        <input type="text" id="stockSearch" placeholder="or type symbol..." autocomplete="off">
         <button id="addStockBtn">+</button>
       </div>
       <div class="watchlist-title">Watchlist</div>
+      <div id="watchlistItems" class="watchlist-items"></div>
     </aside>
 
     <!-- Main Content -->

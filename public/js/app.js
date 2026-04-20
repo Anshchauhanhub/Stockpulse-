@@ -10,7 +10,7 @@ let mainChart = null;
 let tickCount = 0;
 
 // ─── DOM Elements ────────────────────────────────────────────────────────────
-const $watchlist = document.getElementById('watchlist');
+const $watchlistItems = document.getElementById('watchlistItems');
 const $chartSymbol = document.getElementById('chartSymbol');
 const $activityFeed = document.getElementById('activityFeed');
 const $statusDot = document.getElementById('statusDot');
@@ -22,6 +22,7 @@ const $statUptime = document.getElementById('statUptime');
 const $statMongo = document.getElementById('statMongo');
 const $liveClock = document.getElementById('liveClock');
 const $stockSearch = document.getElementById('stockSearch');
+const $popularSelect = document.getElementById('popularSelect');
 const $addStockBtn = document.getElementById('addStockBtn');
 
 // ─── Clock ───────────────────────────────────────────────────────────────────
@@ -140,20 +141,7 @@ function updateChart() {
 
 // ─── Watchlist Cards ─────────────────────────────────────────────────────────
 function renderWatchlist(symbols, prices) {
-  // Keep title
-  const titleEl = $watchlist.querySelector('.watchlist-title');
-  $watchlist.innerHTML = '';
-  if (titleEl) $watchlist.appendChild(titleEl);
-  else {
-    const t = document.createElement('div');
-    t.className = 'watchlist-title';
-    t.textContent = 'Watchlist';
-    $watchlist.appendChild(t);
-  }
-
-  // Preserve search container
-  const searchContainer = document.querySelector('.search-container');
-  if (searchContainer) $watchlist.prepend(searchContainer);
+  $watchlistItems.innerHTML = '';
 
   symbols.forEach(symbol => {
     const card = document.createElement('div');
@@ -180,7 +168,7 @@ function renderWatchlist(symbols, prices) {
       </div>
       <div class="sparkline-container"><canvas id="spark-${symbol}" width="260" height="30"></canvas></div>
     `;
-    $watchlist.appendChild(card);
+    $watchlistItems.appendChild(card);
   });
 }
 
@@ -398,10 +386,11 @@ document.querySelectorAll('.chart-btn').forEach(btn => {
 });
 
 // ─── Search Logic ────────────────────────────────────────────────────────────
-function addStock() {
-  const symbol = $stockSearch.value.trim().toUpperCase();
+function addStock(symbolToUse = null) {
+  const symbol = (symbolToUse || $stockSearch.value).trim().toUpperCase();
   if (!symbol) return;
   
+  const originalBtnText = $addStockBtn.textContent;
   $addStockBtn.disabled = true;
   $addStockBtn.textContent = '...';
 
@@ -413,19 +402,25 @@ function addStock() {
   .then(r => r.json())
   .then(data => {
     $stockSearch.value = '';
+    $popularSelect.value = ''; // Reset dropdown
     $addStockBtn.disabled = false;
-    $addStockBtn.textContent = '+';
+    $addStockBtn.textContent = originalBtnText;
   })
   .catch(err => {
     console.error('Error adding stock:', err);
     $addStockBtn.disabled = false;
-    $addStockBtn.textContent = '+';
+    $addStockBtn.textContent = originalBtnText;
   });
 }
 
-$addStockBtn.addEventListener('click', addStock);
+$addStockBtn.addEventListener('click', () => addStock());
 $stockSearch.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') addStock();
+});
+
+// Dropdown listener
+$popularSelect.addEventListener('change', () => {
+  addStock($popularSelect.value);
 });
 
 // ─── Init ────────────────────────────────────────────────────────────────────

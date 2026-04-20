@@ -182,21 +182,46 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 8px;
+}
+
+.watchlist-items {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   overflow-y: auto;
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 280px);
   padding-right: 4px;
 }
 
-.watchlist::-webkit-scrollbar { width: 4px; }
-.watchlist::-webkit-scrollbar-track { background: transparent; }
-.watchlist::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+.watchlist-items::-webkit-scrollbar { width: 4px; }
+.watchlist-items::-webkit-scrollbar-track { background: transparent; }
+.watchlist-items::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
 
 /* ─── Search Container ───────────────────────────────────── */
 .search-container {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   margin-bottom: 12px;
   padding: 0 4px;
+}
+
+.search-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 8px;
+  color: var(--text-secondary);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  outline: none;
+  cursor: pointer;
+  max-width: 90px;
+  transition: all 0.2s;
+}
+
+.search-select:focus {
+  border-color: var(--accent);
+  color: var(--text-primary);
 }
 
 .search-container input {
@@ -241,6 +266,50 @@ body::before {
 
 .search-container button:active {
   transform: scale(0.95);
+}
+
+/* ─── Trending Section ───────────────────────────────────── */
+.trending-container {
+  padding: 0 4px;
+  margin-bottom: 16px;
+}
+
+.trending-label {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.trending-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pill {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pill:hover {
+  border-color: var(--accent);
+  color: var(--text-primary);
+  background: var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.pill:active {
+  transform: translateY(0);
 }
 
 .watchlist-title {
